@@ -10,9 +10,11 @@ const populateCard = product => `
 <div class="col mb-4">
   <div class="card mb-4 shadow-sm h-100">
     <img
+      id="${product._id}"
       src="${product.imageUrl}"
       class="card-img-top"
       style="height: 200px; object-fit: cover; cursor: pointer"
+      onclick="seeDetails(event)"
     />
     <div class="card-body d-flex flex-column">
       <h5 class="card-title">${product.name}</h5>
@@ -28,7 +30,6 @@ const populateCard = product => `
             Find out more
           </button>
           <button
-            id="${product._id}"
             type="button"
             class="btn btn-sm btn-outline-danger ms-4"
             onclick="deleteProd(event)"
@@ -59,6 +60,11 @@ const loadProducts = fromUpdate => {
     populateCards(products);
   });
 };
+
+const seeDetails = event => {
+  const id = event.currentTarget.id;
+  window.location.assign("../detail/detail.html?prodId=" + id);
+}
 
 window.onload = () => {
   const products = getStoredProducts() ?? [];
