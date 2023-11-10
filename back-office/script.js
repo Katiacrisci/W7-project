@@ -4,9 +4,17 @@ const TOKEN =
 
 const form = document.querySelector("form");
 const resetBtn = document.querySelector(".btn-warning");
-resetBtn.onclick = () => form.reset();
+resetBtn.onclick = () => {
+  form.reset();
+  stopEditing();
+};
 
 const editMode = { status: false, updatingId: undefined };
+const stopEditing = () => {
+  editMode.status = false;
+  editMode.updatingId = undefined;
+  document.getElementById("formMode").innerText = "Create a new Product";
+};
 
 const getStoredProducts = () => {
   return JSON.parse(localStorage.getItem("products"));
@@ -32,12 +40,10 @@ form.addEventListener("submit", async ev => {
   const success = await createOrUpdateProduct(productObj);
   if (success) {
     form.reset();
-    editMode.status = false;
-    editMode.updatingId = undefined;
-    document.getElementById("formMode").innerText = "Create a new Product";
 
     updateInMemoryProducts(productObj);
-    loadProducts();
+    loadProducts(editMode.status);
+    stopEditing();
   }
 });
 
@@ -108,7 +114,10 @@ const getAllProducts = async () => {
   return products.json();
 };
 
-const loadProducts = () => {
+const loadProducts = (fromUpdate) => {
+  if (fromUpdate) {
+    document.getElementById("myGrid").innerHTML = "";
+  }
   getAllProducts().then(products => {
     localStorage.setItem("products", JSON.stringify(products));
 
@@ -127,7 +136,7 @@ const editProd = event => {
   document.getElementById(
     "formMode"
   ).innerText = `Edit Product "${product.name}"`;
-  
+
   form.scrollIntoView({ behavior: "smooth" });
 
   document.getElementById("inputName").value = product.name;
@@ -157,10 +166,10 @@ const deleteProd = event => {
 };
 
 window.onload = () => {
-  const products = JSON.parse(localStorage.getItem("products")) ?? [];
+  const products = getStoredProducts() ?? [];
   if (products.length > 0) {
     populateCards(products);
   } else {
-    loadProducts();
+    loadProducts(false);
   }
 };
