@@ -9,11 +9,14 @@ resetBtn.onclick = () => {
   stopEditing();
 };
 
+const grid = document.getElementById("myGrid");
+
 const editMode = { status: false, updatingId: undefined };
 const stopEditing = () => {
   editMode.status = false;
   editMode.updatingId = undefined;
   document.getElementById("formMode").innerText = "Create a new Product";
+  document.querySelector('button[type="submit"]').innerText = "Create product";
 };
 
 const getStoredProducts = () => {
@@ -102,7 +105,7 @@ const populateCard = product => `
 
 const populateCards = products => {
   products.forEach(product => {
-    document.getElementById("myGrid").innerHTML += populateCard(product);
+    grid.innerHTML += populateCard(product);
   });
 };
 
@@ -114,9 +117,9 @@ const getAllProducts = async () => {
   return products.json();
 };
 
-const loadProducts = (fromUpdate) => {
+const loadProducts = fromUpdate => {
   if (fromUpdate) {
-    document.getElementById("myGrid").innerHTML = "";
+    grid.innerHTML = "";
   }
   getAllProducts().then(products => {
     localStorage.setItem("products", JSON.stringify(products));
@@ -136,6 +139,7 @@ const editProd = event => {
   document.getElementById(
     "formMode"
   ).innerText = `Edit Product "${product.name}"`;
+  document.querySelector('button[type="submit"]').innerText = "Save";
 
   form.scrollIntoView({ behavior: "smooth" });
 
