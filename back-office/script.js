@@ -12,11 +12,7 @@ form.addEventListener("submit", async ev => {
   const success = await createProduct(productObj);
   if (success) {
     form.reset();
-    getAllProducts().then(products => {
-      products.forEach(product => {
-        document.getElementById("myGrid").innerHTML += populateCard(product);
-      });
-    });
+    loadProducts();
   }
 });
 
@@ -36,7 +32,7 @@ const createProduct = async product => {
 
 const populateCard = product => `<div class="col mb-4">
                           <div class="card mb-4 shadow-sm h-100">
-                          <img src=${product.imageUrl} class="card-img-top" style="height: 200px; object-fit: cover; cursor: pointer" onclick="goToDetails(${product._id})">
+                          <img src=${product.imageUrl} class="card-img-top" style="height: 200px; object-fit: cover; cursor: pointer">
                             <div class="card-body d-flex flex-column">
                               <h5 class="card-title">${product.name}</h5>
                                 <div
@@ -47,13 +43,15 @@ const populateCard = product => `<div class="col mb-4">
                                       type="button"
                                       class="btn btn-sm btn-outline-secondary"
                                     >
-                                      View
+                                      Edit
                                     </button>
                                     <button
+                                      id="${product._id}"
                                       type="button"
-                                      class="btn btn-sm btn-outline-secondary"
+                                      class="btn btn-sm btn-outline-danger ms-4"
+                                      onclick="deleteProd(event)"
                                     >
-                                      Hide
+                                      Delete
                                     </button>
                                   </div>
                                   <small class="text-muted">${product.price},00€</small>
@@ -70,10 +68,33 @@ const getAllProducts = async () => {
   return products.json();
 };
 
-window.onload = () => {
+const deleteProduct = async id => {
+  const resp = await fetch(`${URL}/${id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${TOKEN}` }
+  });
+  return resp.ok;
+};
+
+const loadProducts = () => {
   getAllProducts().then(products => {
     products.forEach(product => {
       document.getElementById("myGrid").innerHTML += populateCard(product);
     });
   });
-}
+};
+
+window.onload = () => {
+  loadProducts();
+};
+
+const deleteProd = event => {
+  const id = event.currentTarget.id
+  deleteProduct(id)
+    .then(success => {
+      if (success) {
+        event.target.closest(".col").remove();
+      }
+    })
+    .catch(console.error);
+};
