@@ -7,6 +7,16 @@ const resetBtn = document.querySelector(".btn-warning");
 resetBtn.onclick = () => {
   form.reset();
   stopEditing();
+  if (new URLSearchParams(window.location.search).get("prodId")) {
+    window.history.pushState(
+      {},
+      "Title",
+      "/" +
+        window.location.href
+          .substring(window.location.href.lastIndexOf("/") + 1)
+          .split("?")[0]
+    );
+  }
 };
 
 const grid = document.getElementById("myGrid");
@@ -128,8 +138,11 @@ const loadProducts = fromUpdate => {
   });
 };
 
-const editProd = event => {
-  const id = event.currentTarget.parentElement.children[1].id;
+const editProd = object => {
+  const id =
+    object instanceof Event
+      ? object.currentTarget.parentElement.children[1].id
+      : object._id;
 
   const product = getStoredProducts().find(p => p._id === id);
 
@@ -171,8 +184,18 @@ const deleteProd = event => {
 
 window.onload = () => {
   const products = getStoredProducts() ?? [];
+  0;
+  const searchParams = new URLSearchParams(window.location.search);
+
   if (products.length > 0) {
     populateCards(products);
+    const id = searchParams.get("prodId");
+    if (!id) return;
+
+    const product = products.find(p => p._id === id);
+    if (!product) return;
+
+    editProd(product);
   } else {
     loadProducts(false);
   }

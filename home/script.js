@@ -27,14 +27,7 @@ const populateCard = product => `
             class="btn btn-sm btn-outline-secondary"
             onclick="editProd(event)"
           >
-            Find out more
-          </button>
-          <button
-            type="button"
-            class="btn btn-sm btn-outline-danger ms-4"
-            onclick="deleteProd(event)"
-          >
-            Delete
+            Edit
           </button>
         </div>
         <small class="text-muted">${product.price},00€</small>
@@ -60,6 +53,11 @@ const loadProducts = fromUpdate => {
     populateCards(products);
   });
 };
+
+const editProd = event => {
+  const id = event.currentTarget.parentElement.parentElement.parentElement.parentElement.children[0].id;
+  window.location.assign("../back-office/back-office.html?prodId=" + id);
+}
 
 const seeDetails = event => {
   const id = event.currentTarget.id;
